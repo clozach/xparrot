@@ -1,5 +1,6 @@
 import sys
 import os
+from datetime import datetime
 import requests
 import json
 from pprint import pprint
@@ -23,7 +24,7 @@ def fetch_stale_tasks(api_key):
         print('No records found: [' + str(response.status_code) + ']:' + response.reason)
 
 def auto_archive_task(task, api_key):
-    data = {'fields': {'Status': 'Auto-archived'}}
+    data = {'fields': {'Status': 'Auto-archived', 'Auto-archive Date': datetime.now().isoformat()}}
     headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + airtable_api_key}
 
     response = requests.patch(tasks_table_root + '/' + task['id'], json=data, headers=headers)
