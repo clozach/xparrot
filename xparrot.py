@@ -1,10 +1,12 @@
 import sys
 import os
-from datetime import datetime
-import requests
-import json
+from airtable import Airtable
 from pprint import pprint
+from datetime import datetime
 
+# 📕 Configuration constants
+app_id = 'appiU1DE5MRcJwbMk'
+table = 'xParrot'
 days_til_endangered = 5
 days_til_stale = 7
 hours_til_expiry = 18
@@ -13,77 +15,55 @@ if len(sys.argv) != 2:
   sys.exit("Usage: `python` " + sys.argv[0] + " <AIRTABLE_API_KEY>")
 airtable_api_key = str(sys.argv[1])
 
-tasks_table_root = 'https://api.airtable.com/v0/appiU1DE5MRcJwbMk/Table%201'
+airtable = Airtable(app_id, table, airtable_api_key)
 
-def fetch_endangered_tasks(api_key):
-    headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + api_key}
-    theFilter = "AND({Status}='',DATETIME_DIFF(TODAY(),{CreationTime},'days')>" + str(days_til_endangered) + ')'
-    data = {'filterByFormula':theFilter}
+# 🌪 Filters
+def endangered(dte=days_til_endangered):
+    return "AND({Status}='',DATETIME_DIFF(TODAY(),{CreationTime},'days')>" + str(dte) + ')'
 
-    response = requests.get(tasks_table_root, params=data, headers=headers)
+def stale(dts=days_til_stale):
+    return "AND(OR({Status}='',{Status}='Endangered'),DATETIME_DIFF(TODAY(),{CreationTime},'days')>" + str(dts) + ')'
 
-    if response.status_code == requests.codes.ok:
-        return json.loads(response.content)['records']
-    else:
-        print('No records found: [' + str(response.status_code) + ']:' + response.reason)
+def expired(hte=hours_til_expiry):
+    return "AND({Status}='Auto-archived',DATETIME_DIFF(TODAY(),{Auto-archive Date},'hours')>" + str(hte) + ')'
 
-def fetch_stale_tasks(api_key):
-    headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + api_key}
-    theFilter = "AND({Status}='',DATETIME_DIFF(TODAY(),{CreationTime},'days')>" + str(days_til_stale) + ')'
-    data = {'filterByFormula':theFilter}
+# 🌾 Fields
+def status_endangered():
+    return {'Status': 'Endangered'}
 
-    response = requests.get(tasks_table_root, params=data, headers=headers)
+def status_auto_archived():
+    return {'Status': 'Auto-archived', 'Auto-archive Date': datetime.now().isoformat()}
 
-    if response.status_code == requests.codes.ok:
-        return json.loads(response.content)['records']
-    else:
-        print('No records found: [' + str(response.status_code) + ']:' + response.reason)
+# 🐶 Fetch
+def fetch(airtable, filterString):
+    return airtable.get_iter(formula=filterString)
 
-def fetch_expired_tasks(api_key):
-    headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + api_key}
-    theFilter = "AND({Status}='Auto-archived',DATETIME_DIFF(TODAY(),{Auto-archive Date},'hours')>" + str(hours_til_expiry) + ')'
-    data = {'filterByFormula':theFilter}
+def fetch_endangered_tasks(airtable):
+    return fetch(airtable, endangered())
 
-    response = requests.get(tasks_table_root, params=data, headers=headers)
+def fetch_stale_tasks(airtable, dts=days_til_stale):
+    return fetch(airtable, stale())
 
-    if response.status_code == requests.codes.ok:
-        return json.loads(response.content)['records']
-    else:
-        print('No records found: [' + str(response.status_code) + ']:' + response.reason)
+def fetch_expired_tasks(airtable, hte=hours_til_expiry):
+    return fetch(airtable, expired())
 
-def flag_task_as_endangered(task, api_key):
-    data = {'fields': {'Status': 'Endangered'}}
-    headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + airtable_api_key}
+# ✍️ Update
 
-    response = requests.patch(tasks_table_root + '/' + task_id(task), json=data, headers=headers)
+def update(airtable, task, fields):
+    return airtable.update(task['id'], fields)
 
-    if response.status_code == requests.codes.ok:
-        return json.loads(response.content)
-    else:
-        print('Flagging-as-endangered failed for task ' + task_id(task) + '(' + task_name(task) + '): [' + str(response.status_code) + ']:' + response.reason)
+def flag_as_endangered(airtable, task):
+    return update(airtable, task, status_endangered())
 
-def auto_archive_task(task, api_key):
-    data = {'fields': {'Status': 'Auto-archived', 'Auto-archive Date': datetime.now().isoformat()}}
-    headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + airtable_api_key}
+def auto_archive(airtable, task):
+    return update(airtable, task, status_auto_archived())
 
-    response = requests.patch(tasks_table_root + '/' + task_id(task), json=data, headers=headers)
+def delete(airtable, task):
+    return airtable.delete(task['id'])
 
-    if response.status_code == requests.codes.ok:
-        return json.loads(response.content)
-    else:
-        print('Auto-archive failed for task ' + task_id(task) + '(' + task_name(task) + '): [' + str(response.status_code) + ']:' + response.reason)
-
-def delete_task(task, api_key): # -> {"deleted": <bool>, "id": "<id>"}
-    headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + airtable_api_key}
-    response = requests.delete(tasks_table_root + '/' + task_id(task), headers=headers)
-
-    if response.status_code == requests.codes.ok:
-        return json.loads(response.content)
-    else:
-        print('Deletion failed for task ' + task_id(task) + '(' + task_name(task))
-
+# 📓 Compositions
 def auto_flag_endangered_tasks(): # -> (archived, failed)
-    tasks = fetch_endangered_tasks(airtable_api_key)
+    tasks = next(fetch_endangered_tasks(airtable))
     if (tasks is None) or (len(tasks) == 0):
         print("No tasks to auto-flag. 👻")
         return [], []
@@ -95,7 +75,7 @@ def auto_flag_endangered_tasks(): # -> (archived, failed)
         flagged = []
         failed = []
         for task in tasks:
-            flagged_response = flag_task_as_endangered(task, airtable_api_key)
+            flagged_response = flag_as_endangered(airtable, task)
             if flagged_response is None:
                 print("🐣 Oh noes.")
                 failed.append(task)
@@ -105,7 +85,7 @@ def auto_flag_endangered_tasks(): # -> (archived, failed)
         return flagged, failed
 
 def auto_archive_stale_tasks(): # -> (archived, failed)
-    tasks = fetch_stale_tasks(airtable_api_key)
+    tasks = next(fetch_stale_tasks(airtable))
     if (tasks is None) or (len(tasks) == 0):
         print("No tasks to auto-archive. 😎")
         return [], []
@@ -117,7 +97,7 @@ def auto_archive_stale_tasks(): # -> (archived, failed)
         archived = []
         failed = []
         for task in tasks:
-            auto_archive_response = auto_archive_task(task, airtable_api_key)
+            auto_archive_response = auto_archive(airtable, task)
             if auto_archive_response is None:
                 print("😭 Dang.")
                 failed.append(task)
@@ -127,7 +107,7 @@ def auto_archive_stale_tasks(): # -> (archived, failed)
         return archived, failed
 
 def auto_delete_expired_tasks(): # ->(deleted, failed)
-    tasks = fetch_expired_tasks(airtable_api_key)
+    tasks = next(fetch_expired_tasks(airtable))
     if (tasks is None) or (len(tasks) == 0):
         print("No tasks to auto-delete. ✔️")
         return [], []
@@ -139,7 +119,7 @@ def auto_delete_expired_tasks(): # ->(deleted, failed)
         deleted = []
         failed = []
         for task in tasks:
-            auto_deleted = delete_task(task, airtable_api_key)
+            auto_deleted = delete(airtable, task)
             if auto_deleted is None:
                 print("🙈 Uh oh!")
                 failed.append(task)
@@ -148,6 +128,7 @@ def auto_delete_expired_tasks(): # ->(deleted, failed)
                 deleted.append(auto_deleted)
         return deleted, failed
 
+# 🍹 Misc.
 def task_id(task):
     return task['id']
 
@@ -164,30 +145,24 @@ def notify(title, text):
     print(foo)
     os.system(foo)
 
-archived, failed = auto_archive_stale_tasks()
+# 🎴 POOR MAN'S TESTS
+s, f = auto_flag_endangered_tasks()
+for i in s:
+    notify(task_name(i), '🚩 Flagged')
 
-for a in archived:
-    print(a)
-    notify(task_name(a), '⚠️ Auto-Archived')
+for i in f:
+    notify('🚨 Failed to flag', task_name(i))
 
-for f in failed:
-    notify('🚨 Failed to auto-archive', task_name(f))
+s, f = auto_archive_stale_tasks()
+for i in s:
+    notify(task_name(i), '⚠️ Auto-Archived')
 
+for i in f:
+    notify('🚨 Failed to auto-archive', task_name(i))
 
-deleted, not_deleted = auto_delete_expired_tasks()
+s, f = auto_delete_expired_tasks()
+if len(s) > 0:
+    notify('❌', 'Deleted ' + str(len(s)) + ' expired tasks.')
 
-for d in deleted:
-    print(d)
-    notify('❌', 'Deleted ' + str(len(deleted)) + ' expired tasks.')
-
-for n in not_deleted:
-    print(n)
-
-
-flagged, flag_failed = auto_flag_endangered_tasks()
-for f in flagged:
-    print(f)
-    notify(task_name(f), '🚩 Flagged')
-
-for ff in flag_failed:
-    print(ff)
+for i in f:
+    notify('🚨 Failed to delete', task_name(i))
