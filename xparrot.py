@@ -1,4 +1,5 @@
 import sys
+import os
 import requests
 import json
 from pprint import pprint
@@ -32,18 +33,52 @@ def auto_archive_task(task, api_key):
     else:
         print('Auto-archive failed for task ' + task['id'] + '(' + task['Name'] + '): [' + str(response.status_code) + ']:' + response.reason)
 
-def auto_archive_stale_tasks():
+def auto_archive_stale_tasks(): # -> (archived, failed)
     tasks = fetch_stale_tasks(airtable_api_key)
-    if tasks is not None:
+    if (tasks is None) or (len(tasks) == 0):
+        print("No tasks to auto-archive. 😎")
+        return [], []
+    else:
         print("\n🐕 Fetched these stale tasks 🐕")
         pprint(tasks)
         print("🐕 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 🐕\n")
 
+        archived = []
+        failed = []
+        print(task_id(tasks[0]) + ': ' + task_name(tasks[0]))
+        auto = auto_archive_task(tasks[0], airtable_api_key)
+        print(task_id(auto) + ': ' + task_name(tasks[0]))
         for task in tasks:
             auto_archive_response = auto_archive_task(task, airtable_api_key)
             if auto_archive_response is None:
                 print("😭 Dang.")
+                failed.append(task)
             else:
-                print('Auto-archived 👉  ' + auto_archive_response['fields']['Name'])
+                print('Auto-archived 👉  ' + str(auto_archive_response))
+                archived.append(auto_archive_response)
+        return archived, failed
 
-auto_archive_stale_tasks()
+def task_id(task):
+    return task['id']
+
+def task_name(task):
+    return task['fields']['Name']
+
+def notify(title, text):
+    # os.system("""
+    #           osascript -e 'display notification "{}" with title "{}"'
+    #           """.format(text, title))
+    foo = """
+          osascript -e 'display notification "{}" with title "{}"'
+          """.format(text, title)
+    print(foo)
+    os.system(foo)
+
+archived, failed = auto_archive_stale_tasks()
+
+for a in archived:
+    print(a)
+    notify(task_name(a), '⚠️ Auto-Archived')
+
+for f in failed:
+    notify('🚨 Failed to auto-archive', task_name(f))
