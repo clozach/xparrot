@@ -13,6 +13,11 @@ try:
 except ImportError:
     from StringIO import StringIO as BytesIO
 
+try:
+    import simplejson as json
+except ImportError:
+    import json
+
 headers = {}
 def header_function(header_line):
     # HTTP standard specifies that headers are encoded in iso-8859-1.
@@ -76,4 +81,40 @@ if encoding is None:
 
 body = buffer.getvalue()
 # Decode using the encoding we figured out.
-print(body.decode(encoding))
+recs = json.loads(body.decode(encoding))['records']
+
+# for r in recs: print(r)
+
+ids2 = [r['id'] for r in recs]
+
+print(ids2)
+
+
+# curl -v -XPATCH https://api.airtable.com/v0/appiU1DE5MRcJwbMk/Table%201/recMPxChvmkXCWYJG \
+# -H "Authorization: Bearer keyiAQYWEULeinv72" \
+# -H "Content-type: application/json" \
+#  -d '{
+#   "fields": {
+#     "Status": "Auto-archived"
+#   }
+# }'
+
+
+c = pycurl.Curl()
+c.setopt(c.CUSTOMREQUEST, 'PATCH')
+
+# Form data must be provided already urlencoded.
+c.setopt(c.URL, 'https://api.airtable.com/v0/appiU1DE5MRcJwbMk/Table%201/recMPxChvmkXCWYJG')
+
+c.setopt(pycurl.HTTPHEADER, ['Authorization: Bearer keyiAQYWEULeinv72', 'Content-type: application/json'])
+post_data = {'fields': {'Status': 'Auto-archived'}}
+# Form data must be provided already urlencoded.
+postfields = urlencode(post_data)
+c.setopt(c.POSTFIELDS, postfields)
+
+c.setopt(c.VERBOSE, True)
+c.setopt(c.WRITEFUNCTION, buffer.write)
+# Set our header function.
+c.setopt(c.HEADERFUNCTION, header_function)
+c.perform()
+c.close()
