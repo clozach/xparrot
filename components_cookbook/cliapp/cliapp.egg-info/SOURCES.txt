@@ -1,0 +1,9 @@
+cliapp/__init__.py
+cliapp/__main__.py
+cliapp/classmodule.py
+cliapp/funcmodule.py
+cliapp.egg-info/PKG-INFO
+cliapp.egg-info/SOURCES.txt
+cliapp.egg-info/dependency_links.txt
+cliapp.egg-info/entry_points.txt
+cliapp.egg-info/top_level.txt
