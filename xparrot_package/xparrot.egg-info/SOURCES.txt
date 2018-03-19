@@ -1,0 +1,9 @@
+xparrot/__init__.py
+xparrot/__main__.py
+xparrot/funcmodule.py
+xparrot/xparrot_api.py
+xparrot.egg-info/PKG-INFO
+xparrot.egg-info/SOURCES.txt
+xparrot.egg-info/dependency_links.txt
+xparrot.egg-info/entry_points.txt
+xparrot.egg-info/top_level.txt
