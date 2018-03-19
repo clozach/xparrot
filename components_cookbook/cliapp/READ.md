@@ -54,3 +54,51 @@ What I've done so far is identical, aside the fact that I'm using `cliapp` as th
 Oh, and I just discovered `docopt`, which blows argparse out of the water! Srsly.
 
 Note, if using pip per the tutorial, use `-e` ('editable') for development mode.
+
+Also consider: [`clint`](https://pypi.python.org/pypi/clint/) (from this [list](http://docs.python-guide.org/en/latest/scenarios/cli/)). From what I can tell by skimming, Cliff and Cement are too heavy. `docopt` _seems_ like the way to go for generating args from the help docs themselves. `docopts` should do the trick for parsing. And `clint` could make output fancier…?
+
+Well, at any rate, let's start with a test of docopt by editing `__main__.py` to look like this:
+
+```python
+"""Naval Fate.
+
+Usage:
+  xParrot list
+  xParrot sayHi <name>
+  xParrot (-h | --help)
+  xParrot --version
+
+Options:
+  -h --help     Show this screen.
+  --version     Show version.
+
+"""
+from docopt import docopt
+
+
+def main():
+    arguments = docopt(__doc__, version='cliapp 0.0.1')
+
+    print(arguments)
+
+
+if __name__ == '__main__':
+    main()
+```
+
+Which yields:
+
+```
+$ cliapp list
+{'--help': False,
+ '--version': False,
+ '<name>': None,
+ 'list': True,
+ 'sayHi': False}
+$ cliapp sayHi foo
+{'--help': False,
+ '--version': False,
+ '<name>': 'foo',
+ 'list': False,
+ 'sayHi': True}
+```
