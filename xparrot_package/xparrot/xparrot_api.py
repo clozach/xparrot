@@ -35,7 +35,7 @@ def expired(hte=hours_til_expiry):
         hte) + ')'
 
 
-def ready_for_archive():
+def ready_to_be_moved_to_archive():
     return "OR({Status}='Done',{Status}='Auto-archived')"
 
 
@@ -61,7 +61,7 @@ def fetch_endangered_tasks(airtable):
 
 
 def fetch_archivable_tasks(airtable):
-    return fetch(airtable, ready_for_archive())
+    return fetch(airtable, ready_to_be_moved_to_archive())
 
 
 def fetch_stale_tasks(airtable, dts=days_til_stale):

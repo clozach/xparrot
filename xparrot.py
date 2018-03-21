@@ -12,57 +12,79 @@ days_til_stale = 7
 hours_til_expiry = 18
 
 if len(sys.argv) != 2:
-  sys.exit("Usage: `python` " + sys.argv[0] + " <AIRTABLE_API_KEY>")
+    sys.exit("Usage: `python` " + sys.argv[0] + " <AIRTABLE_API_KEY>")
 airtable_api_key = str(sys.argv[1])
 
 mainTable = Airtable(app_id, table, airtable_api_key)
 
+
 # 🌪 Filters
 def endangered(dte=days_til_endangered):
-    return "AND({Status}='',DATETIME_DIFF(TODAY(),{CreationTime},'days')>" + str(dte) + ')'
+    return "AND({Status}='',DATETIME_DIFF(TODAY(),{CreationTime},'days')>" + str(
+        dte) + ')'
+
 
 def stale(dts=days_til_stale):
-    return "AND(OR({Status}='',{Status}='Endangered'),DATETIME_DIFF(TODAY(),{CreationTime},'days')>" + str(dts) + ')'
+    return "AND(OR({Status}='',{Status}='Endangered'),DATETIME_DIFF(TODAY(),{CreationTime},'days')>" + str(
+        dts) + ')'
+
 
 def expired(hte=hours_til_expiry):
-    return "AND({Status}='Auto-archived',DATETIME_DIFF(TODAY(),{Auto-archive Date},'hours')>" + str(hte) + ')'
+    return "AND({Status}='Auto-archived',DATETIME_DIFF(TODAY(),{Auto-archive Date},'hours')>" + str(
+        hte) + ')'
 
-def ready_for_archive():
+
+def ready_to_be_moved_to_archive():
     return "OR({Status}='Done',{Status}='Auto-archived')"
+
 
 # 🌾 Fields
 def status_endangered():
     return {'Status': 'Endangered'}
 
+
 def status_auto_archived():
-    return {'Status': 'Auto-archived', 'Auto-archive Date': datetime.now().isoformat()}
+    return {
+        'Status': 'Auto-archived',
+        'Auto-archive Date': datetime.now().isoformat()
+    }
+
 
 # 🐶 Fetch
 def fetch(airtable, filterString):
     return airtable.get_iter(formula=filterString)
 
+
 def fetch_endangered_tasks(airtable):
     return fetch(airtable, endangered())
 
+
 def fetch_archivable_tasks(airtable):
-    return fetch(airtable, ready_for_archive())
+    return fetch(airtable, ready_to_be_moved_to_archive())
+
 
 def fetch_stale_tasks(airtable, dts=days_til_stale):
     return fetch(airtable, stale())
 
+
 def fetch_expired_tasks(airtable, hte=hours_til_expiry):
     return fetch(airtable, expired())
 
+
 # ✍️ Update
+
 
 def create(airtable, newTask):
     return airtable.insert(newTask)
 
+
 def update(airtable, task, fields):
     return airtable.update(task['id'], fields)
 
+
 def flag_as_endangered(airtable, task):
     return update(airtable, task, status_endangered())
+
 
 def auto_archive(airtable):
     tasks = next(fetch_archivable_tasks(airtable))
@@ -91,10 +113,11 @@ def auto_archive(airtable):
                 archived.append(task_name(task))
         return archived, failed
 
+
 def move(sourceTable, destTable, task):
     fields = dict(task['fields'])
     if 'Attachments' in fields:
-        del fields['Attachments'] # Moving binaries requires extra effort
+        del fields['Attachments']  # Moving binaries requires extra effort
     result = create(destTable, fields)
     print("🚨")
     print(result)
@@ -103,11 +126,13 @@ def move(sourceTable, destTable, task):
     else:
         return delete(sourceTable, task)
 
+
 def delete(airtable, task):
     return airtable.delete(task['id'])
 
+
 # 📓 Compositions
-def auto_flag_endangered_tasks(airtable): # -> (archived, failed)
+def auto_flag_endangered_tasks(airtable):  # -> (archived, failed)
     tasks = next(fetch_endangered_tasks(airtable))
     if (tasks is None) or (len(tasks) == 0):
         print("No tasks to auto-flag. 👻")
@@ -129,7 +154,8 @@ def auto_flag_endangered_tasks(airtable): # -> (archived, failed)
                 flagged.append(flagged_response)
         return flagged, failed
 
-def auto_archive_stale_tasks(airtable): # -> (archived, failed)
+
+def auto_archive_stale_tasks(airtable):  # -> (archived, failed)
     tasks = next(fetch_stale_tasks(airtable))
     if (tasks is None) or (len(tasks) == 0):
         print("No tasks to auto-archive. 😎")
@@ -151,10 +177,11 @@ def auto_archive_stale_tasks(airtable): # -> (archived, failed)
                 archived.append(auto_archive_response)
         return archived, failed
 
+
 def move(sourceTable, destTable, task):
     fields = dict(task['fields'])
     if 'Attachments' in fields:
-        del fields['Attachments'] # Moving binaries requires extra effort
+        del fields['Attachments']  # Moving binaries requires extra effort
     result = create(destTable, fields)
     print("🚨")
     print(result)
@@ -163,14 +190,17 @@ def move(sourceTable, destTable, task):
     else:
         return delete(sourceTable, task)
 
+
 # 🍹 Misc.
 def task_id(task):
     return task['id']
+
 
 def task_name(task):
     print('Task name')
     print(task)
     return task['fields']['Name']
+
 
 def notify(title, text):
     # os.system("""
@@ -181,6 +211,7 @@ def notify(title, text):
           """.format(text, title)
     print(foo)
     os.system(foo)
+
 
 # 🎴 POOR MAN'S TESTS
 s, f = auto_flag_endangered_tasks(mainTable)
