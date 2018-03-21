@@ -30,10 +30,9 @@ def main():
     args = docopt(__doc__, version='xParrot 0.0.0')
     print(args)
 
-    if isNotEmpty(args['<airtable_api_key>']):
-        api_key = args['<airtable_api_key>']
-    else:
-        api_key = os.environ['AIRTABLE_API_KEY']
+    arg_key = '<airtable_api_key>'
+    env_key = 'AIRTABLE_API_KEY'
+    api_key = resolve_arg_or_env(args, arg_key, env_key)
 
     if not isNotEmpty(api_key):
         print(
@@ -58,6 +57,14 @@ def main():
         print(
             "Actually, with the current help def, docopt won't even let us get this far. 😎"
         )
+
+
+def resolve_arg_or_env(args, arg_key, env_key):
+    if isNotEmpty(args[arg_key]):
+        api_key = args[arg_key]
+    else:
+        api_key = os.environ[env_key]
+    return api_key
 
 
 if __name__ == '__main__':
