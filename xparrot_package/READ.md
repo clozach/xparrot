@@ -2,9 +2,9 @@
 
 Based on [this tutorial](https://medium.com/@trstringer/the-easy-and-nice-way-to-do-cli-apps-in-python-5d9964dc950d)
 
-- `__init__.py`: Tells python that the dir contains a package. Runs this code first, if not empty.
-- `__main__.py`: Main entry point for CLI app (as dictated by `setup.py`)
-  - Minimal implementation to "show it works":
+* `__init__.py`: Tells python that the dir contains a package. Runs this code first, if not empty.
+* `__main__.py`: Main entry point for CLI app (as dictated by `setup.py`)
+  * Minimal implementation to "show it works":
     ```python
     import sys
     from .classmodule import MyClass
@@ -21,7 +21,7 @@ Based on [this tutorial](https://medium.com/@trstringer/the-easy-and-nice-way-to
     if __name__ == '__main__':
         main()
     ```
-- `classmodule.py`: Demonstrates importing a class from a module:
+* `classmodule.py`: Demonstrates importing a class from a module:
   ```python
   class MyClass():
     def __init__(self, name):
@@ -29,12 +29,13 @@ Based on [this tutorial](https://medium.com/@trstringer/the-easy-and-nice-way-to
     def say_name(self):
         print('name is {}'.format(self.name))
   ```
-- `funcmodule.py`: Demonstrates importing a single function from a module:
+* `funcmodule.py`: Demonstrates importing a single function from a module:
   ```python
   def my_function(text_to_display):
     print('text from my_function :: {}'.format(text_to_display))
   ```
-- `setup.py`: Tells python how the app's held together:
+* `setup.py`: Tells python how the app's held together:
+
   ```python
   from setuptools import setup
 
@@ -49,7 +50,7 @@ Based on [this tutorial](https://medium.com/@trstringer/the-easy-and-nice-way-to
     })
   ```
 
-What I've done so far is identical, aside the fact that I'm using `cliapp` as the package and root folder names. 
+What I've done so far is identical, aside the fact that I'm using `cliapp` as the package and root folder names.
 
 Oh, and I just discovered `docopt`, which blows argparse out of the water! Srsly.
 
@@ -102,3 +103,19 @@ $ cliapp sayHi foo
  'list': False,
  'sayHi': True}
 ```
+
+````
+## Remaking XParrot
+
+As of this writing, it's now `xParrot list`, and it works…if you paste the AirTable API key into `__main__.py`…which isn't really ideal. So now I'm adding a new arg, as well as a new ENV option: AIRTABLE_API_KEY
+
+Question: do breakpoints work when xParrot's run from the built-in VSCode terminal? (Answer: apparently not the way I've got things configured! ☹️)
+
+Note that I've got this in my `fish` functions, thus allowing me to replace all calls to xparrot with `xp <command>`, minus the api key:
+
+```fish
+function xp
+    set -g -x AIRTABLE_API_KEY 'insert_your_key_to_api_here'
+    xparrot $argv -k $AIRTABLE_API_KEY
+end
+````
