@@ -16,7 +16,7 @@ Options:
 import os
 from docopt import docopt
 from .xparrot_api import xParrotAPI as x
-from .xparrot_api import ready_to_be_moved_to_archive
+from .xparrot_api import tasks_ready_to_be_moved_to_archive
 from .funcmodule import dummy_print
 
 
@@ -41,7 +41,7 @@ def main():
     elif args['sayHi'] and isNotEmpty(args['<name>']):
         dummy_print('Yo {}!'.format(args['<name>']))
     elif args['list']:
-        response = x(api_key).fetch(ready_to_be_moved_to_archive())
+        response = x(api_key).fetch(tasks_ready_to_be_moved_to_archive())
         print(response)
         tasks = next(response)
         if (tasks is None) or (len(tasks) == 0):

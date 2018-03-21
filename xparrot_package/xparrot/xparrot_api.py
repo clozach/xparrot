@@ -1,3 +1,38 @@
+"""
+
+xParrotAPI Class Instance
+***********************
+
+>>> api_key = 'key98471hasfdkb' # AirTable key
+>>> api = xParrotAPI(api_key)
+>>> api.fetch(ready_to_be_moved_to_archive())
+[{'id': 'recMtGPR0nE6499eC', 'fields': {'Name': 'Mess with Flutter', 'Notes': 'How much effort is needed to make a list from a single xParrot query? Try it out…is it better than Slack? Maybe not best for MVP…but sounds cool!', 'Status': 'Done', 'Link': 'https://flutter.io/setup-macos/', 'Project': ['recZmAQo7QyUzSORd'], 'Subproject': ['recsAxA5QsrtDdAUE']}, 'createdTime': '2018-03-14T08:44:03.000Z'}]
+
+------------------------------------------------------------------------
+
+🌪 Filters:
+
+- endangered_tasks(days_til_endangered) : Status is empty & the days_til_endangered has expired
+- stale_tasks(days_til_stale) : Empty or 'Endangered' status with expired creation date
+- expired_tasks(hte=hours_til_expiry) : Tagged 'Auto-archived' with 'Auto-archive date' expired.
+- tasks_ready_to_be_moved_to_archive() : Status is 'Done' or 'Auto-archived'
+
+🌾 Fields:
+
+- status_endangered : Status is Endangered
+- status_auto_archived : Status is Auto-archived, with the current date provided for reference.
+
+🐶 Actual Fetching
+
+- fetch(airtable, filterString) : non-specific fetch
+- fetch_endangered_tasks(airtable) : tasks w/empty status & expired creation date 👈⚠️This needs tweaking. Instead of creation date, I want to use some other set of metrics: one that responds to user behavior.
+- fetch_archivable_tasks(airtable) : tasks w/status 'Done' or 'Auto-archived'
+- fetch_stale_tasks(airtable, days_til_stale) : empty or 'Endangered' status with creation date > 7. ⚠️ Again, not ideal, this.
+- fetch_expired_tasks(airtable, hours_til_expiry) : 'Auto-archived' with 'Auto-archive date' older than 18 hours old. I.e., tasks that have been marked as somehow done for nearly a day.
+
+Question: Why have I been insisting that the archive exist separate from the todo list? I think perhaps it's because, if we're going to be keeping the equivalent of old scraps of paper around, we must ensure that they don't clutter our "action" space. The todo list must be lean, with as little inertia as possible, no matter what client is used to view it, including the native AirTable tools.
+
+"""  #
 from airtable import Airtable
 from datetime import datetime
 
@@ -20,22 +55,22 @@ class xParrotAPI():
 
 
 # 🌪 Filters
-def endangered(dte=days_til_endangered):
+def endangered_tasks(dte=days_til_endangered):
     return "AND({Status}='',DATETIME_DIFF(TODAY(),{CreationTime},'days')>" + str(
         dte) + ')'
 
 
-def stale(dts=days_til_stale):
+def stale_tasks(dts=days_til_stale):
     return "AND(OR({Status}='',{Status}='Endangered'),DATETIME_DIFF(TODAY(),{CreationTime},'days')>" + str(
         dts) + ')'
 
 
-def expired(hte=hours_til_expiry):
+def expired_tasks(hte=hours_til_expiry):
     return "AND({Status}='Auto-archived',DATETIME_DIFF(TODAY(),{Auto-archive Date},'hours')>" + str(
         hte) + ')'
 
 
-def ready_to_be_moved_to_archive():
+def tasks_ready_to_be_moved_to_archive():
     return "OR({Status}='Done',{Status}='Auto-archived')"
 
 
@@ -57,16 +92,16 @@ def fetch(airtable, filterString):
 
 
 def fetch_endangered_tasks(airtable):
-    return fetch(airtable, endangered())
+    return fetch(airtable, endangered_tasks())
 
 
 def fetch_archivable_tasks(airtable):
-    return fetch(airtable, ready_to_be_moved_to_archive())
+    return fetch(airtable, tasks_ready_to_be_moved_to_archive())
 
 
 def fetch_stale_tasks(airtable, dts=days_til_stale):
-    return fetch(airtable, stale())
+    return fetch(airtable, stale_tasks())
 
 
 def fetch_expired_tasks(airtable, hte=hours_til_expiry):
-    return fetch(airtable, expired())
+    return fetch(airtable, expired_tasks())
