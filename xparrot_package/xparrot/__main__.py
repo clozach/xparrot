@@ -1,16 +1,25 @@
-"""xParrot.
+"""Usage: xparrot list
+          xparrot sayHi <name>
 
-Usage:
-  xparrot list [(-k <airtable_api_key> | --key_to_airtable_api <airtable_api_key>)] [(--todo | --tasks) | --projects | --subprojects ] [ --sort (byExpectedStart | byStatus) ] [ --group (byProject | bySubproject | byStatus) ]
-  xparrot list [(-k <airtable_api_key> | --key_to_airtable_api <airtable_api_key>)]
-  xparrot sayHi <name>
-  xparrot (-h | --help)
-  xparrot --version
+Provides a simple interface for interacting with the xParrot self-cleaning "todo list".
 
 Options:
-  -h --help     Show this screen.
-  --version     Show version.
+  -h --help    Show this screen.
+  --version    Show version.
+  --started    Show only started tasks, or only projects/subprojects containing started tasks.
+  --unstarted  Show only unstarted tasks, or only projects/subprojects containing unstarted tasks.
+  --stale      Show only tasks and/or projects/subprojects that have been ignored long enough to be considered more clutter than useful reminder.
+  --tasks      Show tasks. Can be combined with --project & --subproject.
+  --todos      Show tasks. Can be combined with --project & --subproject.
 
+  --project=<project_name>         Show a specific project. If --tasks is also set, only tasks for the given project will be displayed.
+  --subproject=<sub_project_name>  Show a specific subproject. If --tasks is also set, only tasks for the given subproject will be displayed. Includes the associated project, if applicable.
+
+  -s=<sort_by> --sort=<sort_by>     Valid values TBD
+  -g=<group_by> --group=<group_by>  Valid values TBD
+
+  -k=<airtable_api_key>                     The API Key can alternatively be set in the environment.
+  --key_to_airtable_api=<airtable_api_key>  The API Key can alternatively be set in the environment.
 """
 # todo: add [--filter] or summat to `list` command
 import os
