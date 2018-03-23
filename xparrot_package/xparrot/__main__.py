@@ -1,32 +1,27 @@
-"""Usage: xparrot list
-          xparrot sayHi <name>
+"""
+xParrot-cli provides a simple interface for interacting with the xParrot self-cleaning "todo list".
 
-Provides a simple interface for interacting with the xParrot self-cleaning "todo list".
+You'll need to set `AIRTABLE_API_KEY` in your environment for now. (I wasn't able to figure out a way to launch in interactive mode with a pre-launch variable, so this, sadly, doesn't work: `xparrot -i -k keyXXXXxxxXXX`.
+
+Usage:
+    xparrot (-i | --interactive)
+    xparrot tasks [--sort_by <sort_description>]
+    xparrot projects [--sort_by <sort_description>] [--include_tasks] 
+
 
 Options:
-  -h --help    Show this screen.
-  --version    Show version.
-  --started    Show only started tasks, or only projects/subprojects containing started tasks.
-  --unstarted  Show only unstarted tasks, or only projects/subprojects containing unstarted tasks.
-  --stale      Show only tasks and/or projects/subprojects that have been ignored long enough to be considered more clutter than useful reminder.
-  --tasks      Show tasks. Can be combined with --project & --subproject.
-  --todos      Show tasks. Can be combined with --project & --subproject.
+    -i, --interactive  Interactive Mode
+    -h, --help  Show this screen and exit.
+    --version    Show version.
 
-  --project=<project_name>         Show a specific project. If --tasks is also set, only tasks for the given project will be displayed.
-  --subproject=<sub_project_name>  Show a specific subproject. If --tasks is also set, only tasks for the given subproject will be displayed. Includes the associated project, if applicable.
-
-  -s=<sort_by> --sort=<sort_by>     Valid values TBD
-  -g=<group_by> --group=<group_by>  Valid values TBD
-
-  -k=<airtable_api_key>                     The API Key can alternatively be set in the environment.
-  --key_to_airtable_api=<airtable_api_key>  The API Key can alternatively be set in the environment.
+Powered by docopt. (See simpler example at <project_root>/components_cookbook/interactive_cli.py.)
 """
-# todo: add [--filter] or summat to `list` command
-import os
-from docopt import docopt
+import cmd
+import sys
+import json
 from .xparrot_api import xParrotAPI as x
 from .xparrot_api import tasks_ready_to_be_moved_to_archive
-from .funcmodule import dummy_print
+from .helpers.docopt_helpers import docopt_cmd, docopt
 
 
 def isNotEmpty(
@@ -35,46 +30,47 @@ def isNotEmpty(
     return bool(s and s.strip())
 
 
-def main():
-    args = docopt(__doc__, version='xParrot 0.0.0')
-    print(args)
+class xparrot(cmd.Cmd):
+    intro = 'Welcome to xParrot, the stiffest todo' \
+        + ' list this side of the River Styx!' \
+        + ' (type help for a list of commands.)'
+    prompt = '🐦 § '
+    file = None
 
-    arg_key = '<airtable_api_key>'
-    env_key = 'AIRTABLE_API_KEY'
-    api_key = resolve_arg_or_env(args, arg_key, env_key)
-
-    if not isNotEmpty(api_key):
-        print(
-            'API key missing. Please pass it in with `-k <your_airtable_api_key>` or `--key_to_airtable_api <your_airtable_api_key>`, or set the environment variable, `AIRTABLE_API_KEY`. Thank you.'
-        )
-    elif args['sayHi'] and isNotEmpty(args['<name>']):
-        dummy_print('Yo {}!'.format(args['<name>']))
-    elif args['list']:
-        response = x(api_key).fetch(tasks_ready_to_be_moved_to_archive())
-        print(response)
+    @docopt_cmd
+    def do_tasks(self, arg):
+        """Prints out all tasks.
+        Usage: tasks [--sort_by <sort_description>]
+                
+        Options:
+            -i, --interactive  Interactive Mode
+            -h, --help  Show this screen and exit.
+        """
+        response = x().fetch(tasks_ready_to_be_moved_to_archive())
         tasks = next(response)
         if (tasks is None) or (len(tasks) == 0):
             print("No tasks to auto-archive. 😎")
             return [], []
         else:
             for task in tasks:
-                print("🌊 🌊 🌊")
-                print(task)
-                print("🌊 🌊 🌊")
+                print("\n", json.dumps(task, indent=4), "\n")
 
-    else:
-        print(
-            "Actually, with the current help def, docopt won't even let us get this far. 😎"
-        )
+    @docopt_cmd
+    def do_projects(self, arg):
+        """Usage: projects [--sort_by <sort_description>] [--include_tasks]"""
+        print("\nARGS\n", arg, "\n")
+
+    def do_quit(self, arg):
+        """Quits out of Interactive Mode."""
+        print('💀 🐦🥊 ❧ .  .    .       .             .                 .')
+        exit()
+
+    def do_q(self, arg):
+        """Alias for `quit`."""
+        xparrot.do_quit(self, arg)
 
 
-def resolve_arg_or_env(args, arg_key, env_key):
-    if isNotEmpty(args[arg_key]):
-        api_key = args[arg_key]
-    else:
-        api_key = os.environ[env_key]
-    return api_key
-
-
-if __name__ == '__main__':
-    main()
+cli_args = docopt(__doc__, sys.argv[1:])
+print(cli_args)
+if cli_args['--interactive']:
+    xparrot().cmdloop()

@@ -3,8 +3,7 @@
 xParrotAPI Class Instance
 ***********************
 
->>> api_key = 'key98471hasfdkb' # AirTable key
->>> api = xParrotAPI(api_key)
+>>> api = xParrotAPI() // Make sure to set the AIRTABLE_API_KEY environment variable.
 >>> api.fetch(ready_to_be_moved_to_archive())
 [{'id': 'recMtGPR0nE6499eC', 'fields': {'Name': 'Mess with Flutter', 'Notes': 'How much effort is needed to make a list from a single xParrot query? Try it out…is it better than Slack? Maybe not best for MVP…but sounds cool!', 'Status': 'Done', 'Link': 'https://flutter.io/setup-macos/', 'Project': ['recZmAQo7QyUzSORd'], 'Subproject': ['recsAxA5QsrtDdAUE']}, 'createdTime': '2018-03-14T08:44:03.000Z'}]
 
@@ -45,9 +44,8 @@ hours_til_expiry = 18
 
 
 class xParrotAPI():
-    def __init__(self, api_key):
-        self.api_key = api_key
-        self.remote_service = Airtable(app_id, default_table, api_key)
+    def __init__(self):
+        self.remote_service = Airtable(app_id, default_table)
 
     def fetch(self, filterString, remote=None):
         remote = remote if remote is not None else self.remote_service
