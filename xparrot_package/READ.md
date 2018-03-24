@@ -1,12 +1,18 @@
 # xParrot Interactive CLI App
 
----
+## Installation
 
-Note that this `fish` function no longer works. :(
+```
+cd xparrot_package
+pip install -e .
+```
 
-```fish
-function xp
-    set -g -x AIRTABLE_API_KEY 'insert_your_key_to_api_here'
-    xparrot $argv -k $AIRTABLE_API_KEY
-end
+## Usage
+
+```
+xparrot -i
+```
+
+```
+xparrot -h
 ```
