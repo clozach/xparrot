@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 xParrot-cli provides a simple interface for interacting with the xParrot self-cleaning "todo list".
 
