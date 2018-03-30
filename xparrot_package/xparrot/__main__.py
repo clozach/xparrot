@@ -6,7 +6,7 @@ You'll need to set `AIRTABLE_API_KEY` in your environment for now. (I wasn't abl
 
 Usage:
     xparrot (-i | --interactive)
-    xparrot tasks [--sort_by <sort_description>]
+    xparrot tasks [--sort_by=<sort_description>] [--stale]
     xparrot projects [--sort_by <sort_description>] [--include_tasks] 
 
 
@@ -19,10 +19,10 @@ Powered by docopt. (See simpler example at <project_root>/components_cookbook/in
 """
 import cmd
 import sys
-import json
 from .xparrot_api import xParrotAPI as x
 from .xparrot_api import tasks_ready_to_be_moved_to_archive
 from .helpers.docopt_helpers import docopt_cmd, docopt
+from .helpers.xparrot_api_helpers import print_tasks
 
 
 def isNotEmpty(
@@ -32,31 +32,24 @@ def isNotEmpty(
 
 
 class xparrot(cmd.Cmd):
-    intro = 'Welcome to xParrot, the stiffest todo' \
-        + ' list this side of the River Styx!' \
-        + ' (type help for a list of commands.)'
+    intro = """Welcome to xParrot, the stiffest todo list this side of the River Styx!
+(Type help for a list of commands.)"""
     prompt = '🐦 § '
     file = None
 
     @docopt_cmd
     def do_tasks(self, arg):
         """Prints out all tasks.
-        Usage: tasks [--sort_by <sort_description>]
+        Usage: tasks [--sort_by <sort_description>] [--stale]
                 
         Options:
             -i, --interactive  Interactive Mode
             -h, --help  Show this screen and exit.
         """
-        response = x().fetch(tasks_ready_to_be_moved_to_archive())
-        tasks = next(response)
-        if (tasks is None) or (len(tasks) == 0):
-            print("No tasks to auto-archive. 😎")
-            return [], []
-        else:
-            for task in tasks:
-                print("\n", json.dumps(task, indent=4), "\n")
+        if (arg['--stale']):
+            response = x().fetch(tasks_ready_to_be_moved_to_archive())
+            print_tasks(self, response)
 
-    @docopt_cmd
     def do_projects(self, arg):
         """Usage: projects [--sort_by <sort_description>] [--include_tasks]"""
         print("\nARGS\n", arg, "\n")

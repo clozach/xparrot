@@ -83,24 +83,3 @@ def status_auto_archived():
         'Status': 'Auto-archived',
         'Auto-archive Date': datetime.now().isoformat()
     }
-
-
-# 🐶 Fetch
-def fetch(airtable, filterString):
-    return airtable.get_iter(formula=filterString)
-
-
-def fetch_endangered_tasks(airtable):
-    return fetch(airtable, endangered_tasks())
-
-
-def fetch_archivable_tasks(airtable):
-    return fetch(airtable, tasks_ready_to_be_moved_to_archive())
-
-
-def fetch_stale_tasks(airtable, dts=days_til_stale):
-    return fetch(airtable, stale_tasks())
-
-
-def fetch_expired_tasks(airtable, hte=hours_til_expiry):
-    return fetch(airtable, expired_tasks())
