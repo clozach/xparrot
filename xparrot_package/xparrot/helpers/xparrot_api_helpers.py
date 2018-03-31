@@ -13,28 +13,30 @@ def print_tasks(self, tasksResponse: Generator[Iterator, None, None]):
         return [], []
     else:
         newline()
+        format_tasks(tasks)
+        newline()
+
+def format_tasks(tasks):
         for i, task in enumerate(tasks):
+        # print("\n", json.dumps(task['fields'], indent=4), "\n") # 👈 For debugging
             if i > 0: # Don't pad first row
                 newline()
-            # print("\n", json.dumps(task['fields'], indent=4), "\n")
             for k, v in task['fields'].items():
-                keyStyle = C.HEADER
-                valStyle = ''
-                if k == 'Notes':
-                    continue
+                format_attribute(k, v)
 
-                elif k == 'Status':
-                    status(k, v)
-                        
-                elif k == 'Name':
-                    name(k, v)
-
-                elif k == 'Link':
-                    link(k, v)
-
-                else:
-                    generic_line(k, v)
-        newline()
+def format_attribute(k, v):
+    keyStyle = C.HEADER
+    valStyle = ''
+    if k == 'Notes':
+        return
+    elif k == 'Status':
+        status(k, v)
+    elif k == 'Name':
+        name(k, v)
+    elif k == 'Link':
+        link(k, v)
+    else:
+        generic_line(k, v)
 
 def newline():
     print('')
