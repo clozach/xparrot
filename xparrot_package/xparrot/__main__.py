@@ -48,7 +48,9 @@ class xparrot(cmd.Cmd):
         """
         if (arg['--stale']):
             response = x().fetch(tasks_ready_to_be_moved_to_archive())
-            print_tasks(self, response)
+        else:
+            response = x().fetch('')
+        print_tasks(self, response)
 
     def do_projects(self, arg):
         """Usage: projects [--sort_by <sort_description>] [--include_tasks]"""
