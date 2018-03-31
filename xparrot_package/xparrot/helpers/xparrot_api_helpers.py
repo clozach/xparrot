@@ -12,8 +12,10 @@ def print_tasks(self, tasksResponse: Generator[Iterator, None, None]):
         print(C.WARNING + "No tasks to auto-archive. 😎" + C.RESET)
         return [], []
     else:
-        for task in tasks:
-            print_record_boundary()
+        newline()
+        for i, task in enumerate(tasks):
+            if i > 0: # Don't pad first row
+                newline()
             # print("\n", json.dumps(task['fields'], indent=4), "\n")
             for k, v in task['fields'].items():
                 keyStyle = C.HEADER
@@ -32,37 +34,39 @@ def print_tasks(self, tasksResponse: Generator[Iterator, None, None]):
 
                 else:
                     generic_line(k, v)
+        newline()
 
-            print_record_boundary()
-
-def print_record_boundary():
-    print(C.BASE + '\n〰〰〰〰〰〰〰〰〰〰〰〰〰〰〰〰〰〰〰〰〰〰' + C.RESET) 
+def newline():
+    print('')
 
 def name(k, v):
-    print(C.HEADER + k.title() + C.BASE, ": ", C.NAME + v + C.BASE)
+    print(C.HEADER + k.title() + ": " + C.RESET, C.NAME + v + C.RESET)
 
 def status(k, v):
-    value_style = C.OKGREEN #Default
-    if v == 'Auto-archived':
-        value_style = C.STRIKE + C.OKBLUE
-    print(C.HEADER + k + C.BASE, ": ", value_style + v + C.BASE)
+    if v == 'Done':
+        value_style = C.WHITE_ON_GREEN
+    elif v == 'Auto-archived':
+        value_style = C.STRIKE + C.WHITE_ON_BLUE
+    else:
+        value_style = C.NULL_STYLE
+    print(C.HEADER + k + C.RESET, ": ", value_style + v + C.RESET)
 
 def link(k, v):
-    print(C.HEADER + k + C.BASE, ": ", C.LINK + v + C.BASE)
+    print(C.HEADER + k + C.RESET, ": ", C.LINK + v + C.RESET)
 
 def generic_line(k, v):
-    print(C.HEADER + k.title() + C.BASE, ": ", v)
+    print(C.HEADER + k.title() + C.RESET, ": ", v)
 
 class C:
-    BASE = fg(90, 90, 90) + bg(32, 32, 32) + rs.underline
+    NULL_STYLE = ''
     BOLD = ef.bold
     FAIL = fg.magenta
     HEADER = fg(232, 209, 209) + ef.bold
     LINK = fg.blue + ef.underline
     NAME = fg.white + ef.bold
-    OKBLUE = bg.blue + fg.white
-    OKGREEN = bg.da_green + fg.white
-    RESET = fg.rs + bg.rs + rs.italic + rs.bold + rs.underline + rs.strike
+    WHITE_ON_BLUE = bg.blue + fg.white
+    WHITE_ON_GREEN = bg.da_green + fg.white
+    RESET = fg.green + bg.black + rs.italic + rs.bold + rs.underline + rs.strike
     STRIKE = ef.strike
     UNDERLINE = ef.underline
     WARNING = fg.red
