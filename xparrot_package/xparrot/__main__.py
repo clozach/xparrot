@@ -6,7 +6,7 @@ You'll need to set `AIRTABLE_API_KEY` in your environment for now. (I wasn't abl
 
 Usage:
     xparrot (-i | --interactive)
-    xparrot tasks [--sort_by=<sort_description>] [--started | --stale | --done]
+    xparrot tasks [--sort_by=<sort_description>] [--started | --stale | --done | --autodone]
     xparrot projects [--sort_by <sort_description>] [--include_tasks] 
 
 
@@ -40,7 +40,7 @@ class xparrot(cmd.Cmd):
     @docopt_cmd
     def do_tasks(self, arg):
         """Prints out all tasks.
-        Usage: tasks [--sort_by <sort_description>] [--started | --stale | --done]
+        Usage: tasks [--sort_by <sort_description>] [--started | --stale | --done | --autodone]
                 
         Options:
             -i, --interactive  Interactive Mode
@@ -52,6 +52,8 @@ class xparrot(cmd.Cmd):
             response = x().fetch(xPF.stale())
         elif (arg['--done']):
             response = x().fetch(xPF.done())
+        elif (arg['--autodone']):
+            response = x().fetch(xPF.auto_archived())
         else:
             response = x().fetch(xPF.unstarted())
         print_tasks(self, response)
