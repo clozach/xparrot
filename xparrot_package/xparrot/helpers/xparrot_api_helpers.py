@@ -9,7 +9,7 @@ from typing import Generator, Iterator
 def print_tasks(self, tasksResponse: Generator[Iterator, None, None]):
     tasks = next(tasksResponse)
     if (tasks is None) or (len(tasks) == 0):
-        print(C.WARNING + "No tasks to auto-archive. 😎" + C.RESET)
+        print(C.WARNING + "No tasks match your request. 😎" + C.RESET)
         return [], []
     else:
         newline()

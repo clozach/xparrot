@@ -41,10 +41,24 @@ class xPF():
     def unstarted():
         return "{Status}=''"
 
-    # @staticmethod
-    # def endangered_task(dte=days_til_endangered):
-    #     return "AND({Status}='',DATETIME_DIFF(TODAY(),{CreationTime},'days')>" + str(
-    #         dte) + ')'
+    @classmethod
+    def endangered(cls, dte=days_til_endangered):
+        """Tasks that will be auto-archived if no action is taken "soon".
+
+        Here "soon" is defined as "within {days_til_stale} - {days_til_endangered}".
+        For example, if dts==7 and dte==5, `endangered` tasks are those tasks that
+        will be expired in 2 days or less.
+
+        Note that only Unstarted tasks can be Endangered. (Probably should include
+        Started tasks as well? Baby steps.)
+        
+        Keyword Arguments:
+            dte {num} -- The age at which the task will be considered "Expired" (default: {days_til_endangered})
+        
+        Returns:
+            str -- A query string for Airtable's `filterByFormula` query parameter 
+        """
+        return "AND({Status}=''," + cls.older_than('{CreationTime}', dte) + ')'
 
     @staticmethod
     def started():
@@ -58,19 +72,41 @@ class xPF():
     def auto_archived():
         return "{Status}='Auto-archived'"
 
-    # @staticmethod
-    # def stale_tasks(dts=days_til_stale):
-    #     return "AND(OR({Status}='',{Status}='Endangered'),DATETIME_DIFF(TODAY(),{CreationTime},'days')>" + str(
-    #         dts) + ')'
+    @classmethod
+    def stale(cls, dts=days_til_stale):
+        """Tasks ready to have the `Auto-archived` tag and `Auto-archive Date` applied
 
-    # @staticmethod
-    # def expired_tasks(hte=hours_til_expiry):
-    #     return "AND({Status}='Auto-archived',DATETIME_DIFF(TODAY(),{Auto-archive Date},'hours')>" + str(
-    #         hte) + ')'
+        Note that only Unstarted and Endangered tasks can be Stale. (As with `endangered`,
+        there may be cause to include Started here as well)
+        
+        Keyword Arguments:
+            dts {num} -- The age at which the task will be considered "Stale" (default: {days_til_stale})
+        
+        Returns:
+            str -- A query string for Airtable's `filterByFormula` query parameter
+        """
+        return "AND(OR({Status}='',{Status}='Endangered')," + cls.older_than('{CreationTime}', dts) + ')'
+
 
     @staticmethod
-    def stale():
+    def expired():
+        """Tasks needing to be archived
+
+        Future possibility: remove "Done" and "Auto-archived" statuses from the xParrot table,
+        as well as the "Auto-archived Date", limiting those concepts to the Archive table (which,
+        in turn, would not include "Started" and "Endangered" tags)
+
+        Again. Baby steps.
+        
+        Returns:
+            str -- A query string for Airtable's `filterByFormula` query parameter
+        """
         return "OR({Status}='Done',{Status}='Auto-archived')"
+
+    @staticmethod
+    def older_than(birth_date_string, number_of_days, units='days'):
+        return "DATETIME_DIFF(TODAY()," + birth_date_string + ",'days')>" + str(
+            number_of_days)
 
 
 class xPPropertyJSON():
