@@ -51,7 +51,7 @@ class xparrot(cmd.Cmd):
         elif (arg['--stale']):
             response = x().fetch(xPF.stale())
         else:
-            response = x().fetch('')
+            response = x().fetch(xPF.unstarted())
         print_tasks(self, response)
 
     def do_projects(self, arg):

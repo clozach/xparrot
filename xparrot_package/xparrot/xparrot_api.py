@@ -38,23 +38,27 @@ class xPF():
     """
 
     @staticmethod
-    def endangered_task(dte=days_til_endangered):
-        return "AND({Status}='',DATETIME_DIFF(TODAY(),{CreationTime},'days')>" + str(
-            dte) + ')'
+    def unstarted():
+        return "{Status}=''"
+
+    # @staticmethod
+    # def endangered_task(dte=days_til_endangered):
+    #     return "AND({Status}='',DATETIME_DIFF(TODAY(),{CreationTime},'days')>" + str(
+    #         dte) + ')'
 
     @staticmethod
     def started():
         return "{Status}='Started'"
 
-    @staticmethod
-    def stale_tasks(dts=days_til_stale):
-        return "AND(OR({Status}='',{Status}='Endangered'),DATETIME_DIFF(TODAY(),{CreationTime},'days')>" + str(
-            dts) + ')'
+    # @staticmethod
+    # def stale_tasks(dts=days_til_stale):
+    #     return "AND(OR({Status}='',{Status}='Endangered'),DATETIME_DIFF(TODAY(),{CreationTime},'days')>" + str(
+    #         dts) + ')'
 
-    @staticmethod
-    def expired_tasks(hte=hours_til_expiry):
-        return "AND({Status}='Auto-archived',DATETIME_DIFF(TODAY(),{Auto-archive Date},'hours')>" + str(
-            hte) + ')'
+    # @staticmethod
+    # def expired_tasks(hte=hours_til_expiry):
+    #     return "AND({Status}='Auto-archived',DATETIME_DIFF(TODAY(),{Auto-archive Date},'hours')>" + str(
+    #         hte) + ')'
 
     @staticmethod
     def stale():
