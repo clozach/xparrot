@@ -42,7 +42,7 @@ def newline():
     print('')
 
 def name(k, v):
-    print(C.HEADER + k.title() + ": " + C.RESET, C.NAME + v + C.RESET)
+    print(format_label(k), C.NAME + v + C.RESET)
 
 def status(k, v):
     if v == 'Done':
@@ -51,24 +51,26 @@ def status(k, v):
         value_style = C.STRIKE + C.WHITE_ON_BLUE
     else:
         value_style = C.NULL_STYLE
-    print(C.HEADER + k + C.RESET, ": ", value_style + v + C.RESET)
+    print(format_label(k), value_style + v + C.RESET)
 
 def link(k, v):
-    print(C.HEADER + k + C.RESET, ": ", C.LINK + v + C.RESET)
+    print(format_label(k), C.LINK + v + C.RESET)
 
 def generic_line(k, v):
-    print(C.HEADER + k.title() + C.RESET, ": ", v)
+    print(format_label(k.title()), v, C.RESET)
+
+def format_label(k):
+    return C.HEADER + k + ": " + C.RESET
 
 class C:
     NULL_STYLE = ''
-    BOLD = ef.bold
     FAIL = fg.magenta
-    HEADER = fg(232, 209, 209) + ef.bold
+    HEADER = fg(232, 209, 209) + ef.faint
     LINK = fg.blue + ef.underline
-    NAME = fg.white + ef.bold
+    NAME = fg.white
     WHITE_ON_BLUE = bg.blue + fg.white
     WHITE_ON_GREEN = bg.da_green + fg.white
-    RESET = fg.green + bg.black + rs.italic + rs.bold + rs.underline + rs.strike
+    RESET = fg.green + bg.black + rs.italic + rs.underline + rs.strike + rs.faint
     STRIKE = ef.strike
     UNDERLINE = ef.underline
     WARNING = fg.red
