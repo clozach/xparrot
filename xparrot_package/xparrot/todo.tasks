@@ -1,0 +1,15 @@
+# xParrot Behaviors to Prioritize
+	☐ List tasks by status:
+		☐ Unstarted (blank)
+		✔ Started (--started) @done (March 31st 2018, 21:39)
+		☐ Endangered
+		☐ Done (--done)
+		☐ Auto-archived (--auto-archived)
+		✔ Stale (Done | Auto-archived) (--stale) @done (March 31st 2018, 22:47)
+	☐ List projects
+	☐ List subprojects
+	☐ List tasks by project
+	☐ List tasks by subproject
+	☐ Change the status on a particular task
+	☐ Change the status on a(n arbitrary) list of tasks
+	☐ 

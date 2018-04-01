@@ -59,6 +59,10 @@ def endangered_tasks(dte=days_til_endangered):
         dte) + ')'
 
 
+def tasks_in_progress():
+    return "{Status}='Started'"
+
+
 def stale_tasks(dts=days_til_stale):
     return "AND(OR({Status}='',{Status}='Endangered'),DATETIME_DIFF(TODAY(),{CreationTime},'days')>" + str(
         dts) + ')'

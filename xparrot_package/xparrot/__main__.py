@@ -6,7 +6,7 @@ You'll need to set `AIRTABLE_API_KEY` in your environment for now. (I wasn't abl
 
 Usage:
     xparrot (-i | --interactive)
-    xparrot tasks [--sort_by=<sort_description>] [--stale]
+    xparrot tasks [--sort_by=<sort_description>] [--started | --stale]
     xparrot projects [--sort_by <sort_description>] [--include_tasks] 
 
 
@@ -20,7 +20,7 @@ Powered by docopt. (See simpler example at <project_root>/components_cookbook/in
 import cmd
 import sys
 from .xparrot_api import xParrotAPI as x
-from .xparrot_api import tasks_ready_to_be_moved_to_archive
+from .xparrot_api import tasks_ready_to_be_moved_to_archive, tasks_in_progress
 from .helpers.docopt_helpers import docopt_cmd, docopt
 from .helpers.xparrot_api_helpers import print_tasks
 
@@ -40,13 +40,15 @@ class xparrot(cmd.Cmd):
     @docopt_cmd
     def do_tasks(self, arg):
         """Prints out all tasks.
-        Usage: tasks [--sort_by <sort_description>] [--stale]
+        Usage: tasks [--sort_by <sort_description>] [--started | --stale]
                 
         Options:
             -i, --interactive  Interactive Mode
             -h, --help  Show this screen and exit.
         """
-        if (arg['--stale']):
+        if (arg['--started']):
+            response = x().fetch(tasks_in_progress())
+        elif (arg['--stale']):
             response = x().fetch(tasks_ready_to_be_moved_to_archive())
         else:
             response = x().fetch('')
