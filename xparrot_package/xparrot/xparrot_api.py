@@ -33,37 +33,46 @@ class xParrotAPI():
         return remote.get_iter(formula=filterString)
 
 
-# 🌪 Filters
-def endangered_tasks(dte=days_til_endangered):
-    return "AND({Status}='',DATETIME_DIFF(TODAY(),{CreationTime},'days')>" + str(
-        dte) + ')'
+class xPF():
+    """xPF == xParrot Filters
+    """
+
+    @staticmethod
+    def endangered_task(dte=days_til_endangered):
+        return "AND({Status}='',DATETIME_DIFF(TODAY(),{CreationTime},'days')>" + str(
+            dte) + ')'
+
+    @staticmethod
+    def started():
+        return "{Status}='Started'"
+
+    @staticmethod
+    def stale_tasks(dts=days_til_stale):
+        return "AND(OR({Status}='',{Status}='Endangered'),DATETIME_DIFF(TODAY(),{CreationTime},'days')>" + str(
+            dts) + ')'
+
+    @staticmethod
+    def expired_tasks(hte=hours_til_expiry):
+        return "AND({Status}='Auto-archived',DATETIME_DIFF(TODAY(),{Auto-archive Date},'hours')>" + str(
+            hte) + ')'
+
+    @staticmethod
+    def stale():
+        return "OR({Status}='Done',{Status}='Auto-archived')"
 
 
-def tasks_in_progress():
-    return "{Status}='Started'"
+class xPPropertyJSON():
+    """xPProps == xParrot Property JSON
+    Encapsulates structures used to make changes to records in Airtable
+    """
 
+    @staticmethod
+    def status_endangered():
+        return {'Status': 'Endangered'}
 
-def stale_tasks(dts=days_til_stale):
-    return "AND(OR({Status}='',{Status}='Endangered'),DATETIME_DIFF(TODAY(),{CreationTime},'days')>" + str(
-        dts) + ')'
-
-
-def expired_tasks(hte=hours_til_expiry):
-    return "AND({Status}='Auto-archived',DATETIME_DIFF(TODAY(),{Auto-archive Date},'hours')>" + str(
-        hte) + ')'
-
-
-def tasks_ready_to_be_moved_to_archive():
-    return "OR({Status}='Done',{Status}='Auto-archived')"
-
-
-# 🌾 Fields
-def status_endangered():
-    return {'Status': 'Endangered'}
-
-
-def status_auto_archived():
-    return {
-        'Status': 'Auto-archived',
-        'Auto-archive Date': datetime.now().isoformat()
-    }
+    @staticmethod
+    def status_auto_archived():
+        return {
+            'Status': 'Auto-archived',
+            'Auto-archive Date': datetime.now().isoformat()
+        }

@@ -25,8 +25,6 @@ def format_tasks(tasks):
                 format_attribute(k, v)
 
 def format_attribute(k, v):
-    keyStyle = C.HEADER
-    valStyle = ''
     if k == 'Notes':
         return
     elif k == 'Status':
