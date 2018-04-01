@@ -50,6 +50,10 @@ class xPF():
     def started():
         return "{Status}='Started'"
 
+    @staticmethod
+    def done():
+        return "{Status}='Done'"
+
     # @staticmethod
     # def stale_tasks(dts=days_til_stale):
     #     return "AND(OR({Status}='',{Status}='Endangered'),DATETIME_DIFF(TODAY(),{CreationTime},'days')>" + str(
