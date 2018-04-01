@@ -1,15 +1,19 @@
 # xParrot Behaviors to Prioritize
-	☐ List tasks by status:
+	✔ List tasks by status: @done (April 1st 2018, 11:04)
 		✔ Unstarted (blank) @done (March 31st 2018, 22:51)
 		✔ Started (--started) @done (March 31st 2018, 21:39)
 		✔ Endangered (i.e., "will be auto-archived in 2(?) days or less") @done (April 1st 2018, 10:21)
 		✔ Done (--done) @done (March 31st 2018, 22:57)
 		✔ Auto-archived (--autodone) @done (March 31st 2018, 23:00)
 		✔ Stale (--stale) @done (March 31st 2018, 22:47)
-	☐ List projects
-	☐ List subprojects
+	✔ List projects @done (April 1st 2018, 11:01)
+	✔ List subprojects @done (April 1st 2018, 11:01)
+	☐ Fix ordering of --<filter_type> in cli help
+	☐ Refactor printing facilities from global to class methods
 	☐ List tasks by project
 	☐ List tasks by subproject
 	☐ Change the status on a particular task
 	☐ Change the status on a(n arbitrary) list of tasks
-	☐ 
+	☐ --sort-by
+	☐ --include-tasks
+	☐ Remove `Auto-archived Date` from xParrot table (Possibly as part of a new "Archive" story)

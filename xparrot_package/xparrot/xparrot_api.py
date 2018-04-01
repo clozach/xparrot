@@ -19,6 +19,8 @@ from datetime import datetime
 # 📕 Configuration constants. Extract to top-level config
 app_id = 'appiU1DE5MRcJwbMk'
 default_table = 'xParrot'
+projects_table = 'Projects'
+subprojects_table = 'Subprojects'
 days_til_endangered = 5
 days_til_stale = 7
 hours_til_expiry = 18
@@ -27,9 +29,19 @@ hours_til_expiry = 18
 class xParrotAPI():
     def __init__(self):
         self.remote_service = Airtable(app_id, default_table)
+        self.remote_projects_service = Airtable(app_id, projects_table)
+        self.remote_subprojects_service = Airtable(app_id, subprojects_table)
 
     def fetch(self, filterString, remote=None):
         remote = remote if remote is not None else self.remote_service
+        return remote.get_iter(formula=filterString)
+
+    def fetch_projects(self, filterString='', remote=None):
+        remote = remote if remote is not None else self.remote_projects_service
+        return remote.get_iter(formula=filterString)
+
+    def fetch_subprojects(self, filterString='', remote=None):
+        remote = remote if remote is not None else self.remote_subprojects_service
         return remote.get_iter(formula=filterString)
 
 
@@ -85,8 +97,8 @@ class xPF():
         Returns:
             str -- A query string for Airtable's `filterByFormula` query parameter
         """
-        return "AND(OR({Status}='',{Status}='Endangered')," + cls.older_than('{CreationTime}', dts) + ')'
-
+        return "AND(OR({Status}='',{Status}='Endangered')," + cls.older_than(
+            '{CreationTime}', dts) + ')'
 
     @staticmethod
     def expired():

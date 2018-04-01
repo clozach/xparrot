@@ -6,9 +6,9 @@ You'll need to set `AIRTABLE_API_KEY` in your environment for now. (I wasn't abl
 
 Usage:
     xparrot (-i | --interactive)
-    xparrot tasks [--sort_by=<sort_description>] [--started | --stale | --done | --autodone | --endangered | --expired]
-    xparrot projects [--sort_by <sort_description>] [--include_tasks] 
-
+    xparrot tasks [--sort-by=<sort_description>] [--started | --stale | --done | --autodone | --endangered | --expired]
+    xparrot projects [--sort-by <sort_description>] [--include-tasks] 
+    xparrot subprojects [--sort-by <sort_description>] [--include-tasks] 
 
 Options:
     -i, --interactive  Interactive Mode
@@ -22,7 +22,7 @@ import sys
 from .xparrot_api import xParrotAPI as x
 from .xparrot_api import xPF
 from .helpers.docopt_helpers import docopt_cmd, docopt
-from .helpers.xparrot_api_helpers import print_tasks
+from .helpers.xparrot_api_helpers import print_tasks, print_projects, print_subprojects
 
 
 def isNotEmpty(
@@ -40,7 +40,7 @@ class xparrot(cmd.Cmd):
     @docopt_cmd
     def do_tasks(self, arg):
         """Prints out all tasks.
-        Usage: tasks [--sort_by <sort_description>] [--started | --stale | --done | --autodone | --endangered | --expired]
+        Usage: tasks [--sort-by <sort_description>] [--started | --stale | --done | --autodone | --endangered | --expired]
                 
         Options:
             -i, --interactive  Interactive Mode
@@ -63,8 +63,14 @@ class xparrot(cmd.Cmd):
         print_tasks(self, response)
 
     def do_projects(self, arg):
-        """Usage: projects [--sort_by <sort_description>] [--include_tasks]"""
-        print("\nARGS\n", arg, "\n")
+        """Usage: projects [--sort-by <sort_description>] [--include-tasks]"""
+        response = x().fetch_projects()
+        print_projects(self, response)
+
+    def do_subprojects(self, arg):
+        """Usage: subprojects [--sort-by <sort_description>] [--include-tasks]"""
+        response = x().fetch_subprojects()
+        print_subprojects(self, response)
 
     def do_quit(self, arg):
         """Quits out of Interactive Mode."""
