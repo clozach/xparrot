@@ -39,7 +39,9 @@ class xparrot(cmd.Cmd):
 
     @docopt_cmd
     def do_tasks(self, arg):
-        """Prints out all tasks.
+        """Prints out tasks.
+        📝 --sort-by NYI. The default filter is Unstarted. "All" is not currently an option.
+
         Usage: tasks [--sort-by <sort_description>] [--started | --stale | --done | --autodone | --endangered | --expired]
                 
         Options:
@@ -83,6 +85,5 @@ class xparrot(cmd.Cmd):
 
 
 cli_args = docopt(__doc__, sys.argv[1:])
-print(cli_args)
 if cli_args['--interactive']:
     xparrot().cmdloop()
