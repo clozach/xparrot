@@ -8,6 +8,10 @@
 		✔ Stale (--stale) @done (March 31st 2018, 22:47)
 	✔ List projects @done (April 1st 2018, 11:01)
 	✔ List subprojects @done (April 1st 2018, 11:01)
+	✔ Get a task by ID (Enabler for 👇) @done (April 4th 2018, 20:46)
+	☐ Change a task's status:
+		`xparrot status (--id <record-id> | --name <name>) --new-status <status>`
+		(Note: --name is less precise than record, but should _usually_ work fine if you don't have the id.)
 	☐ Fix ordering of --<filter_type> in cli help
 	☐ Refactor printing facilities from global to class methods
 	☐ List tasks by project

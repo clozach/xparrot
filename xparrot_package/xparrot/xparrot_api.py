@@ -15,6 +15,8 @@ Question: Why have I been insisting that the archive exist separate from the tod
 """  #
 from airtable import Airtable
 from datetime import datetime
+import requests
+from requests.exceptions import HTTPError
 
 # 📕 Configuration constants. Extract to top-level config
 app_id = 'appiU1DE5MRcJwbMk'
@@ -43,6 +45,25 @@ class xParrotAPI():
     def fetch_subprojects(self, filterString='', remote=None):
         remote = remote if remote is not None else self.remote_subprojects_service
         return remote.get_iter(formula=filterString)
+
+    def task(self, id=None, name=None, remote=None):
+        """Task by ID (or, eventually, by name)
+        
+        Keyword Arguments:
+            id {str} -- AirTable ID (default: {None})
+            name {str} -- Contents of Airtable `Name` field (default: {None})
+            remote {Airtable} -- The Airtable table to query (default: {None})
+        
+        Returns:
+            record (`dict`) or None -- Airtable record.
+        """
+
+        remote = remote if remote is not None else self.remote_service
+        if id == None and name == None:
+            print('No task identifier given.')
+            return None
+        elif id != None:
+            return remote.get(id)
 
 
 class xPF():

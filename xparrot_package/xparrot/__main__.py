@@ -9,6 +9,7 @@ Usage:
     xparrot tasks [--sort-by=<sort_description>] [--started | --stale | --done | --autodone | --endangered | --expired]
     xparrot projects [--sort-by <sort_description>] [--include-tasks] 
     xparrot subprojects [--sort-by <sort_description>] [--include-tasks] 
+    xparrot task (--id <record-id> | --name <name>)
 
 Options:
     -i, --interactive  Interactive Mode
@@ -22,7 +23,7 @@ import sys
 from .xparrot_api import xParrotAPI as x
 from .xparrot_api import xPF
 from .helpers.docopt_helpers import docopt_cmd, docopt
-from .helpers.xparrot_api_helpers import print_tasks, print_projects, print_subprojects
+from .helpers.xparrot_api_helpers import print_tasks, print_task, print_projects, print_subprojects
 
 
 def isNotEmpty(
@@ -64,15 +65,32 @@ class xparrot(cmd.Cmd):
             response = x().fetch(xPF.unstarted())
         print_tasks(self, response)
 
+    @docopt_cmd
     def do_projects(self, arg):
         """Usage: projects [--sort-by <sort_description>] [--include-tasks]"""
         response = x().fetch_projects()
         print_projects(self, response)
 
+    @docopt_cmd
     def do_subprojects(self, arg):
-        """Usage: subprojects [--sort-by <sort_description>] [--include-tasks]"""
+        """Prints out 
+        Usage: subprojects [--sort-by <sort_description>] [--include-tasks]"""
         response = x().fetch_subprojects()
         print_subprojects(self, response)
+
+    @docopt_cmd
+    def do_task(self, arg):
+        """Usage: task (--id <record-id> | --name <name>)"""
+        if (arg['--id']):
+            task_id = arg['<record-id>']
+            try:
+                response = x().task(task_id)
+                print_task(response)
+            except Exception as e:
+                print('⚠️ ', e)
+        elif (arg['--name']):  # CURRENTLY BROKEN! 😱
+            task_name = arg['<name>']
+            response = x().fetch(xPF.by_name(task_name))
 
     def do_quit(self, arg):
         """Quits out of Interactive Mode."""

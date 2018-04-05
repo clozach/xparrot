@@ -20,11 +20,16 @@ def print_tasks(self, tasksResponse: Generator[Iterator, None, None]):
 
 def format_tasks(tasks):
     for i, task in enumerate(tasks):
-        # print("\n", json.dumps(task['fields'], indent=4), "\n") # 👈 For debugging
-        if i > 0:  # Don't pad first row
-            newline()
-        for k, v in task['fields'].items():
-            format_task_attribute(k, v)
+        print_task(task, i)
+
+
+def print_task(task, i=0):
+    # print("\n", json.dumps(task['fields'], indent=4), "\n") # 👈 For debugging
+    if i > 0:  # Don't pad first row
+        newline()
+    for k, v in task['fields'].items():
+        format_task_attribute(k, v)
+    generic_line('id', task['id'])
 
 
 def format_task_attribute(k, v):
