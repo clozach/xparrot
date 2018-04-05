@@ -3,5 +3,8 @@
   "python.linting.pylintEnabled": true,
   "python.linting.enabled": true,
   "python.pythonPath": "/Users/clozach/anaconda3/bin/python",
+  "python.pythonPath": "Guess I originally installed anaconda, now I'm using the Brew Cellar",
+  "python.pythonPath": "Point being, the last definition wins, so this 👇 is the Python used by VSCode",
+  "python.pythonPath": "/usr/local/bin/python3",
   "python.formatting.provider": "yapf"
 }
