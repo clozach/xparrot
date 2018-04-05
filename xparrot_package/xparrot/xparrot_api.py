@@ -94,6 +94,10 @@ class xPF():
         return "AND({Status}=''," + cls.older_than('{CreationTime}', dte) + ')'
 
     @staticmethod
+    def by_name(name):
+        return "{Name}='Name'"
+
+    @staticmethod
     def started():
         return "{Status}='Started'"
 

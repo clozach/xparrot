@@ -63,20 +63,20 @@ class xparrot(cmd.Cmd):
             response = x().fetch(xPF.expired())
         else:
             response = x().fetch(xPF.unstarted())
-        print_tasks(self, response)
+        print_tasks(response)
 
     @docopt_cmd
     def do_projects(self, arg):
         """Usage: projects [--sort-by <sort_description>] [--include-tasks]"""
         response = x().fetch_projects()
-        print_projects(self, response)
+        print_projects(response)
 
     @docopt_cmd
     def do_subprojects(self, arg):
         """Prints out 
         Usage: subprojects [--sort-by <sort_description>] [--include-tasks]"""
         response = x().fetch_subprojects()
-        print_subprojects(self, response)
+        print_subprojects(response)
 
     @docopt_cmd
     def do_task(self, arg):
@@ -88,9 +88,11 @@ class xparrot(cmd.Cmd):
                 print_task(response)
             except Exception as e:
                 print('⚠️ ', e)
-        elif (arg['--name']):  # CURRENTLY BROKEN! 😱
+        elif (arg['--name']): # 🙀 Only works for task names without spaces
             task_name = arg['<name>']
+            print('👗 Looking up Task "', task_name, '"')
             response = x().fetch(xPF.by_name(task_name))
+            print_tasks(self, response)
 
     def do_quit(self, arg):
         """Quits out of Interactive Mode."""
