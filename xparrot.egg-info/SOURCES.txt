@@ -1,0 +1,9 @@
+LICENSE
+README.md
+setup.py
+tests/test_xparrot.py
+xparrot.egg-info/PKG-INFO
+xparrot.egg-info/SOURCES.txt
+xparrot.egg-info/dependency_links.txt
+xparrot.egg-info/requires.txt
+xparrot.egg-info/top_level.txt

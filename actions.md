@@ -1,0 +1,2 @@
+- [x] Migrate from Airtable to mysql using LLM to untangle this old mess
+- [ ] Update README with operation instructions
