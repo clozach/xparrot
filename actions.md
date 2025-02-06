@@ -1,4 +1,4 @@
 - [x] Migrate from Airtable to mysql using LLM to untangle this old mess
-- [ ] Update README with operation instructions
+- [x] Update README with operation instructions
     - [x] Add quick start guide (dependencies, env setup, run)
-    - [ ] Document basic task operations
+    - [x] Document basic task operations

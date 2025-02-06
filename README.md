@@ -31,3 +31,30 @@ python -m xparrot_package.xparrot.migrate
 ```
 
 That's it! You're ready to use xParrot.
+
+## Basic Operations
+
+```python
+from xparrot_package.xparrot.xparrot_api import xParrotAPI, xPF
+
+# Initialize API
+api = xParrotAPI()
+
+# Create a task
+task = api.create_task(
+    name="My first task",
+    notes="This is a task description",
+    status=""  # Empty status means unstarted
+)
+
+# List unstarted tasks
+tasks = api.fetch(xPF.unstarted())
+
+# Mark task as started
+api.update_task(task.id, status="Started")
+
+# Mark task as done
+api.update_task(task.id, status="Done")
+
+# Delete task
+api.delete_task(task.id)
